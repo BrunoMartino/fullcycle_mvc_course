@@ -1,0 +1,77 @@
+services:
+  backend:
+    container_name: app-backend
+    build:
+      context: .
+      dockerfile: ${BACKEND_DOCKERFILE:-Dockerfile}
+      args:
+        user: ${DOCKER_USER_ID}
+        uid: ${DOCKER_GROUP_ID}
+    image: app-backend
+    restart: unless-stopped
+    working_dir: ${BACKEND_WORKDIR}
+    volumes:
+      - .:${BACKEND_WORKDIR}
+    ports:
+      - "${BACKEND_PORT:-9000}:${BACKEND_PORT:-9000}"
+    environment:
+      APP_NAME: ${APP_NAME}
+      APP_ENV: ${APP_ENV}
+      APP_DEBUG: ${APP_DEBUG}
+      APP_URL: ${APP_URL}
+    depends_on:
+      - db
+      - cache
+    networks:
+      - app-net
+
+  nginx:
+    container_name: app-nginx
+    image: nginx:alpine
+    restart: unless-stopped
+    ports:
+      - "4000:80"
+    volumes:
+      - .:${BACKEND_WORKDIR}
+      - ./.docker/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./.docker/nginx/conf.d:/etc/nginx/conf.d
+    depends_on:
+      - backend
+    networks:
+      - app-net
+
+  db:
+    container_name: app-db
+    image: mysql:8
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+    volumes:
+      - db:/var/lib/mysql
+      - ./.docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+    ports:
+      - "3306:3306"
+    networks:
+      - app-net
+
+  cache:
+    container_name: app-cache
+    image: redis:alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - cache:/data
+    networks:
+      - app-net
+
+volumes:
+  db:
+  cache:
+
+networks:
+  app-net:
+    driver: bridge
