@@ -33,4 +33,8 @@ router.delete("/companies/:id", (req, res, next) =>
   companyController.delete(req, res, next)
 );
 
+router.get("/ping", (req, res, next) => {
+  return res.send("pong");
+});
+
 export default router;

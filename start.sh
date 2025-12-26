@@ -7,15 +7,17 @@ cd /home/node/app
 
 ## USE A O CÒDIGO ABAIXO para instalar Node
 # Roda npm install apenas se node_modules não existir
+#!/bin/bash
+
+cd /home/node/app
+
 if [ ! -d "node_modules" ]; then
     echo "Rodando npm install..."
     npm install
-else
-    echo "node_modules já existe, pulando npm install."
 fi
 
-# Mantém o container rodando
-tail -f /dev/null
+# INICIA O BACKEND
+npm run dev
 
 
 
