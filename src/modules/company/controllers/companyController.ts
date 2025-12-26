@@ -7,7 +7,7 @@ import { validateCNPJ } from "../validators/validateCnpj";
 import { validateCreateCompany } from "../validators/validateCreateCompany";
 import { validateUpdateCompany } from "../validators/validateUpdateCompany";
 
-export class companyController {
+export class CompanyController {
   constructor(private readonly companyService: CompanyService) {}
 
   async create(

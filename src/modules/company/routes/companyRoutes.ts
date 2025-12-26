@@ -1,9 +1,13 @@
 import { Router } from "express";
-import { companyController } from "../controllers/companyController";
+import { InMemoryCompanyRepository } from "../repositories/inMemoryCompanyRepository";
+import { CompanyServiceImpl } from "../services/CompanyService";
+import { CompanyController } from "../controllers/companyController";
 
 const router = Router();
 
-const companyController = new companyController();
+const companyRepository = new InMemoryCompanyRepository();
+const companyService = new CompanyServiceImpl(companyRepository);
+const companyController = new CompanyController(companyService);
 
 router.post("/companies/", (req, res, next) =>
   companyController.create(req, res, next)
